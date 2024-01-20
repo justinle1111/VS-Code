@@ -18,7 +18,8 @@ def createFile():
 
 def welcomenote():
     print("Welcome to PyNote!")
-
+    print("Here are your notes: ")
+    print()
 def writeFile(user_input):
     with open('pynote.txt', 'a') as myfile:
             myfile.write(user_input + "\n")
