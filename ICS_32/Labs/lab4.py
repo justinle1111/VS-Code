@@ -41,16 +41,17 @@ def acorn_placer() -> str:
     """
     return f"L{random.randrange(1,TREE_DEPTH)}-{random.randrange(1,NODE_DEPTH)}"
 
-def find_acorn(tree, root):
-    root = []
+def find_acorn(tree, path, pathway):
+
     for level in tree:
         if type(level) == list:
-            root.append(level[0])
-            find_acorn(level, root)
+            path += " "
+            path += level[0]
+            find_acorn(level, path, pathway)
         else:
             if "(acorn)" in level:
-                print("This acorn is in this", level)
-    return root
+                pathway.append(path)
+    return pathway
 
 def run():
     # create a tree and start placing acorns
@@ -61,10 +62,34 @@ def run():
     
     # insert your solution code here
 
-    find_acorn(tree, [])
+    #Edits Pathways to make it into proper format
+    pathway = find_acorn(tree, "", [])
+    edited_no_acorn = []
+    for path in pathway:
+        path = path.replace("(acorn)", "")
+        edited_no_acorn.append(path)
+    pathway_list = []
+    for string in edited_no_acorn:
+        string_list = string.split()
+        pathway_list.append(string_list)
+    empty_list = []
+    empty_string = ""
+    for acorn_pathway in pathway_list:
+        for path in acorn_pathway:
+            if path == acorn_pathway[-1]:
+                empty_string += path
+            else:
+                empty_string += (path + " -> ")
+        empty_list.append(empty_string)
+    
+    #final results
+    print(f'You have {len(empty_list)} acorns on your tree!')
+    print("They are located on the following branches:")
+    #prints all the pathways
+    for string in empty_list:
+        print(string)
     # end solution
 
 if __name__ == "__main__":
     print("Welcome to PyAcornFinder! \n")
-
     run()
