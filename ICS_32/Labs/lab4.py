@@ -56,12 +56,8 @@ def find_acorn(tree, path, pathway):
 def run():
     # create a tree and start placing acorns
     tree = tree_builder([], 1, acorn_placer())
-    # print the tree for testing. 
-    # TODO: REMOVE THIS PRINT STATEMENT BEFORE YOU SUBMIT YOUR LAB
-    print(tree)
-    
     # insert your solution code here
-
+    
     #Edits Pathways to make it into proper format
     pathway = find_acorn(tree, "", [])
     edited_no_acorn = []
