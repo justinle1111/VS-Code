@@ -33,16 +33,37 @@ def only_same_extension(path, keyword, path_n):
 def recursive_files(path):
     for paths in path.iterdir():
         if paths.is_dir():
-            recursive(paths)
+            recursive_files(paths)
         else:
             print(paths)
+
+#This is R and E
+def recursive_extension(path, keyword, path_n):
+
+    for paths in path.iterdir():
+        if paths.is_dir():
+            recursive_extension(paths, keyword, path_n)
+        else:
+            if keyword in path_name[-1]:
+                print(paths)
+
+#R and S
+def recursive_name(path, keyword, path_n):
+    path_name = path_n.split()
+    for paths in path.iterdir():
+        if paths.is_dir():
+            recursive_extension(paths, keyword, path_n)
+        else:
+            if path_name[-1] == keyword:
+                print(paths)
+
 def content_list():
     for paths in myPath.iterdir():
         print(paths)
 
 
 if __name__ == "__main__":
-    user_input = "L /Users/justinle/VS_Code -r"
+    user_input = "L /Users/justinle/Downloads/VS_Code/ICS_32/Assignments -e py"
     while user_input != "Q":
         user_input_list = user_input.split()
         command = user_input_list[0]
@@ -80,14 +101,22 @@ if __name__ == "__main__":
                     if option == "-e":
                         only_same_extension(myPath, other_input, path)
                         user_input = input()
-                    elif option == "-f":
-                        only_same_extension(myPath, other_input, path)
+                    elif option == "-s":
+                        only_same_name(myPath, other_input, path)
                         user_input = input()
                     elif option == "-r" and other_input == "-f":
                         recursive_files(myPath)
                         user_input = input()
-                    
-                    
+                elif len(user_input_list) == 5:
+                    option = user_input_list[2]
+                    other_input = user_input_list[3]
+                    another_input = user_input_list[4]
+                    if option == "-r" and other_input == "-e":
+                        recursive_extension(myPath, another_input, path)
+                        user_input = input()
+                    elif option == "-r" and other_input == "-f":
+                        recursive_name(myPath, another_input, path)
+                        user_input = input()
             else:
                  print("file or folder doesn't exist, Please choose again!")
                  user_input = input()
