@@ -73,15 +73,16 @@ def run():
         string_list = string.split()
         pathway_list.append(string_list)
     empty_list = []
-    empty_string = ""
+   
     for acorn_pathway in pathway_list:
+        empty_string = "L0-0 -> "
         for path in acorn_pathway:
             if path == acorn_pathway[-1]:
                 empty_string += path
             else:
                 empty_string += (path + " -> ")
         empty_list.append(empty_string)
-    
+
     #final results
     print(f'You have {len(empty_list)} acorns on your tree!')
     print("They are located on the following branches:")
