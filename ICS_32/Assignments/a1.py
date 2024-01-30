@@ -17,10 +17,10 @@ def recursive(path):
             print(paths)
 
 #Command R
-def read_contents(path):
-    if path.exists():
+def read_contents(path, myPath):
+    if myPath.exists():
         if "dsu" in path:
-            with open(path) as f:
+            with open(myPath) as f:
                 file = f.read()
                 print(file)
         else:
@@ -33,11 +33,12 @@ def create_file(path, file_name):
     file_path = newPath / file_name
     file_path.touch()
     print(file_path)
+
 #Command D
-def delete_file(path):
-    if path.exists():
+def delete_file(path, myPath):
+    if myPath.exists():
         if "dsu" in path:
-            path.unlink()
+            myPath.unlink()
             print(path, "DELETED")
     else:
         print("Error")
@@ -157,22 +158,29 @@ if __name__ == "__main__":
                  user_input = input()
         elif command == "D":
             if myPath.exists():
-                delete_file(myPath)
+                delete_file(path, myPath)
                 user_input = input()
             else:
                 print("file or folder doesn't exist, Please choose again!")
                 user_input = input()
         elif command == "R":
             if myPath.exists():
-                read_contents(myPath)
+                read_contents(path, myPath)
                 user_input = input()
         elif command == "C":
             try:
                 option = user_input_list[2]
                 file_name = user_input_list[3]
+                if myPath.exists():
+                    if option == "-n":
+                        create_file(myPath, file_name)
+                        user_input = input()
+                    else:
+                        print("Error")
+                        user_input = input()
             except:
                 print("Error")
                 user_input = input()
-            if myPath.exists():
-                create_file(myPath, file_name)
-                user_input = input()
+        else:
+            print("Invalid Command")
+            user_input = input()

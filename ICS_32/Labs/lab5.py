@@ -12,7 +12,7 @@ def is_int(val):
         int(val)
         return True
     except ValueError:
-        return False
+        assert False
 
 def save_note(note: str):
     # create path obj to notes storage file
