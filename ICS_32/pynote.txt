@@ -1,0 +1,2 @@
+2
+/usr/bin/python3 /Users/justinle/Downloads/VS_Code/ICS_32/Labs/lab8.py
