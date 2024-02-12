@@ -69,12 +69,33 @@ def command_P(path, user_input_list):
         print(profile.username, profile.password, profile.bio, profile._posts)
     else:
         print("Invalid option")
+def command_E(path, user_input_list):
+    print(user_input_list)
+    try:
+        action = user_input_list[1]
+        option = user_input_list[2]
+    except:
+        print("Invalid Input")
+    profile = Profile()
+    profile.load_profile(path)
+    if action == "-usr":
+        profile.username = option
+    elif action == "-pwd":
+        profile = Profile(password=option)
+    elif action == "-bio":
+        profile = Profile(bio=option)
+    elif action == "-addpost":
+        pass
+    elif action == "-delpost":
+        pass
+    else:
+        print("Invalid Input")
 
 if __name__ == "__main__":
     user_input = input()
-    user_input_list = shlex.split(user_input)
+    initial_user_input_list = shlex.split(user_input)
     try:
-        path = user_input_list[1]
+        path = initial_user_input_list[1]
     except:
         path = ""
     while user_input != "Q":
@@ -83,11 +104,13 @@ if __name__ == "__main__":
         elif user_input[0] == "O":
             command_O(path, user_input)
         elif user_input[0] == "P":
+            user_input_list = shlex.split(user_input)
             command_P(path, user_input_list)
         elif user_input[0] == "E":
-            pass
+            user_input_list = shlex.split(user_input)
+            command_E(path, user_input_list)
         user_input = input()
 
 
 
-                                           
+                                 
