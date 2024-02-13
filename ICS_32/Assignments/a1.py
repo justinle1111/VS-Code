@@ -26,14 +26,6 @@ def read_contents(path, myPath):
         else:
             print("Error")
 
-#Command C
-def create_file(path, file_name):
-    newPath = Path(path)
-    file_name = file_name + ".dsu"
-    file_path = newPath / file_name
-    file_path.touch()
-    print(file_path)
-
 #Command D
 def delete_file(path, myPath):
     if myPath.exists():
@@ -184,3 +176,107 @@ if __name__ == "__main__":
         else:
             print("Invalid Command")
             user_input = input()
+
+def create_file(path, file_name):
+    file_name = file_name + ".dsu"
+    file_path = path / file_name
+    file_path.touch()
+    return file_path
+
+def command_C(path, user_input):
+    try:
+        input_1 = initial_user_input_list[2]
+        name = initial_user_input_list[3]
+    except:
+        print("Invalid Format, Must Use [C] [input] [[-]option] [name]")
+    test_file = path + "/" + name + ".dsu"
+    test_path = Path(test_file)
+    if test_path.exists():
+        print("File exists will Load")
+        command_O(test_file)
+    else:
+        newPath = Path(path)
+        newFile = create_file(newPath, name)
+        new_user_username = input("Please enter a username: ")
+        new_user_password = input("Please enter a password: ")
+        new_user_profile = Profile(dsuserver=str(newFile), username=new_user_username, password=new_user_password)
+        new_user_profile.save_profile(newFile)
+        command_O(test_file)
+
+def command_O(path):
+    if ".dsu" in path:
+        user_profile = Profile()
+        user_profile.load_profile(path)
+        print("Profile has been loaded")
+    else:
+        print("path is not a dsu file")
+
+def command_P(path, user_input_list):
+    try:
+        action = user_input_list[1]
+    except:
+        print("Invalid Input")
+    profile = Profile()
+    profile.load_profile(path)
+    if len(user_input_list) == 2:
+        if action == "-usr":
+            print(profile.username)
+        elif action == "-pwd":
+            print(profile.password)
+        elif action == "-bio":
+            print(profile.bio)
+        elif action == "-posts":
+            print(profile._posts)
+        elif action == "-post":
+            try:
+                id = user_input_list[2]
+                print(profile._posts[id])
+            except:
+                print("Id of post is invalid")
+        elif action == "-all":
+            print(profile.username, profile.password, profile.bio, profile._posts)
+        else:
+            print("Invalid option")
+    elif len(user_input_list) == 3:
+        pass
+    elif len(user_input_list) == 4:
+        pass
+    else:
+        print("Either you put more than 2 options or invalid options, please ")
+def command_E(path, user_input_list):
+    try:
+        action = user_input_list[1]
+        option = user_input_list[2]
+    except:
+        print("Invalid Action or Option")
+    profile = Profile()
+    profile.load_profile(path)
+    if action == "-usr":
+        profile = Profile(username=option)
+        profile.save_profile(path)
+    elif action == "-pwd":
+        profile = Profile(password=option)
+        profile.save_profile(path)
+    elif action == "-bio":
+        profile = Profile(bio=option)
+        profile.save_profile(path)
+    elif action == "-addpost":
+        post = Post()
+        post.set_entry(option)
+        profile = Profile()
+        profile.load_profile(path)
+        profile.get_posts()
+        profile.add_post(post)
+        profile.save_profile(path)
+    elif action == "-delpost":
+        try:
+            option = int(option)
+        except:
+            print("option is not a number")
+        profile = Profile()
+        profile.load_profile(path)
+        profile.get_posts()
+        profile.del_post(option)
+        profile.save_profile(path)
+    else:
+        print("Invalid Input")
