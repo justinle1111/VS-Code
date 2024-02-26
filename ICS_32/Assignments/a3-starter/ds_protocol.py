@@ -29,3 +29,12 @@ def extract_json(json_msg:str) -> DataTuple:
     print("Json cannot be decoded.")
 
   return DataTuple(foo, baz)
+
+def join():
+  pass
+
+def post():
+  pass
+
+def bio():
+  pass
