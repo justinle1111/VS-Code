@@ -4,37 +4,42 @@
 
 # Replace the following placeholders with your information.
 
-# NAME
-# EMAIL
-# STUDENT ID
+# Justin Le
+# lej42@uci.edu
+# 50644854
 
 import json
 from collections import namedtuple
-
+import time
 # Namedtuple to hold the values retrieved from json messages.
 # TODO: update this named tuple to use DSP protocol keys
-DataTuple = namedtuple('DataTuple', ['foo','baz'])
+DataTuple = namedtuple('response', ['type', 'message', 'token'])
 
 def extract_json(json_msg:str) -> DataTuple:
   '''
   Call the json.loads function on a json string and convert it to a DataTuple object
-  
-  TODO: replace the pseudo placeholder keys with actual DSP protocol keys
   '''
   try:
     json_obj = json.loads(json_msg)
-    foo = json_obj['foo']
-    baz = json_obj['bar']['baz']
+    type = json_obj['response']['type']
+    message = json_obj['response']['message']
+    token = json_obj['response']['token']
+
   except json.JSONDecodeError:
     print("Json cannot be decoded.")
 
-  return DataTuple(foo, baz)
+  return DataTuple(type, message, token)
 
-def join():
-  pass
+def join(username, password):
+  message = {"join": {"username": username,"password": password,"token":""}}
+  return json.dumps(message)
 
-def post():
-  pass
+def post(token, post):
+  timestamp = time.time()
+  message = {"token":token, "post": {"entry": post,"timestamp": timestamp}}
+  return json.dumps(message)
 
-def bio():
-  pass
+def bio(token, bio):
+  timestamp = time.time()
+  message = {"token":token, "bio": {"entry": bio,"timestamp": timestamp}}
+  return json.dumps(message)
