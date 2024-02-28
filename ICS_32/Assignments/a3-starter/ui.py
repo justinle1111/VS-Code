@@ -10,6 +10,9 @@
 from pathlib import Path
 from Profile import Profile
 from Profile import Post
+import ds_client
+server = "168.235.86.101"
+port = 3021
 #THIS IS -R
 def recursive(path):
     for paths in path.iterdir():
@@ -255,6 +258,8 @@ def command_E(path, user_input_list):
             profile.get_posts()
             profile.add_post(post)
             profile.save_profile(path)
+            ds_client.send(server, port, profile.username, profile.password, option, profile.bio)
+            print("Uploaded to server")
         elif action == "-delpost":
             try:
                 option = int(option)
@@ -287,6 +292,8 @@ def command_E(path, user_input_list):
             profile.get_posts()
             profile.add_post(post)
             profile.save_profile(path)
+            ds_client.send(server, port, profile.username, profile.password, option_2, profile.bio)
+            print("Uploaded to server")
         elif action == "-usr" and action_2 == "-delpost":
             profile.username = option
             post = Post()
@@ -313,6 +320,8 @@ def command_E(path, user_input_list):
             profile.get_posts()
             profile.add_post(post)
             profile.save_profile(path)
+            ds_client.send(server, port, profile.username, profile.password, option_2, profile.bio)
+            print("Uploaded to server")
         elif action == "-pwd" and action_2 == "-delpost":
             profile.password = option
             post = Post()
@@ -332,6 +341,8 @@ def command_E(path, user_input_list):
             profile.add_post(post)
             profile.username = option_2
             profile.save_profile(path)
+            ds_client.send(server, port, profile.username, profile.password, option, profile.bio)
+            print("Uploaded to server")
         elif action == "-addpost" and action_2 == "-bio":
             post = Post()
             post.set_entry(option)
@@ -350,6 +361,8 @@ def command_E(path, user_input_list):
             profile.add_post(post)
             profile.password = option_2
             profile.save_profile(path)
+            ds_client.send(server, port, profile.username, profile.password, option, profile.bio)
+            print("Uploaded to server")
         elif action == "-addpost" and action_2 == "-delpost":
             post = Post()
             post.set_entry(option)
@@ -366,7 +379,8 @@ def command_E(path, user_input_list):
             profile.get_posts()
             profile.del_post(post)
             profile.save_profile(path)
-        
+            ds_client.send(server, port, profile.username, profile.password, option, profile.bio)
+            print("Uploaded to server")
         elif action == "-delpost" and action_2 == "-usr":
             post = Post()
             post.set_entry(option)
@@ -401,7 +415,6 @@ def command_E(path, user_input_list):
             profile.load_profile(path)
             profile.get_posts()
             profile.del_post(post)
-            profile.password = option_2
             post = Post()
             post.set_entry(option_2)
             profile = Profile()
@@ -409,7 +422,11 @@ def command_E(path, user_input_list):
             profile.get_posts()
             profile.add_post(post)
             profile.save_profile(path)
+            ds_client.send(server, port, profile.username, profile.password, option_2, profile.bio)
+            print("Uploaded to server")
         else:
             print("Invalid, Len 4")
     else:
         print("Invalid Input Please only put 2 actions")
+
+
