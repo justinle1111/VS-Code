@@ -99,7 +99,7 @@ def recursive_name(path, keyword):
             if path_name[-1] == keyword:
                 print(paths)
 
-def content_list():
+def content_list(myPath):
     for paths in myPath.iterdir():
         print(paths)
 

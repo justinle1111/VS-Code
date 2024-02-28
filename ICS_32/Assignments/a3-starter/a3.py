@@ -96,7 +96,7 @@ if __name__ == "__main__":
                 myPath = Path(path)
                 if myPath.exists():
                     if len(user_input_list) == 2:
-                            ui.content_list()
+                            ui.content_list(myPath)
                             user_input = input()
                     elif len(user_input_list) == 3:
                         option = user_input_list[2]
