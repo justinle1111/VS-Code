@@ -34,6 +34,7 @@ def send(server:str, port:int, username:str, password:str, message:str, bio:str=
       resp = recv.readline()
       resp = ds_protocol.extract_json(resp)
       token = resp.token
+
       if resp.type == "ok":
         msg = ds_protocol.post(token, message)
         client.sendall(msg.encode("utf-8"))
@@ -42,10 +43,9 @@ def send(server:str, port:int, username:str, password:str, message:str, bio:str=
           updated_bio = ds_protocol.bio(token, bio)
           client.sendall(updated_bio.encode("utf-8"))
       return True
-    except:
-      print("Error")
+    except Exception as error:
+      print("Error: ", error)
       return False
-
 
 
     

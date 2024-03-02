@@ -423,7 +423,6 @@ def command_E(path, user_input_list):
             profile.add_post(post)
             profile.save_profile(path)
             ds_client.send(server, port, profile.username, profile.password, option_2, profile.bio)
-            print("Uploaded to server")
         else:
             print("Invalid, Len 4")
     else:

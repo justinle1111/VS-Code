@@ -205,7 +205,6 @@ if __name__ == "__main__":
                     edit_list.append(e_item_input)
                     ui.command_E(newPath, edit_list)
                     print("To see your change please use the print command")
-                    print(edit_list)
                     edit_list = ['E']
                 else:
                     print("Invalid Command Try Again")
