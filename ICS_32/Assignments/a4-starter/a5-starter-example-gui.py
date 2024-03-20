@@ -147,9 +147,9 @@ class MainApp(tk.Frame):
     def __init__(self, root):
         tk.Frame.__init__(self, root)
         self.root = root
-        self.username = None
-        self.password = None
-        self.server = None
+        self.username = "ILOVEKIMCHAEWON534912"
+        self.password = "AMONGUSPASSWORDSECRET"
+        self.server = "168.235.86.101"
         self.recipient = None
         # You must implement this! You must configure and
         # instantiate your DirectMessenger instance after this line.
@@ -163,14 +163,17 @@ class MainApp(tk.Frame):
 
     def send_message(self):
         # You must implement this!
-        pass
+        message = self.body.get_text_entry()
+        send_msg = self.direct_messenger.send(message, self.recipient)
+        self.publish(send_msg)
 
     def add_contact(self):
         # You must implement this!
         # Hint: check how to use tk.simpledialog.askstring to retrieve
         # the name of the new contact, and then use one of the body
         # methods to add the contact to your contact list
-        pass
+        contact = tk.simpledialog.askstring("Contact", "Add your contact:")
+        self.body.insert_contact(contact)
 
     def recipient_selected(self, recipient):
         self.recipient = recipient
@@ -187,12 +190,15 @@ class MainApp(tk.Frame):
         self.direct_messenger = ds_messenger.DirectMessenger(self.server, self.username, self.password)
 
     def publish(self, message:str):
+        message = self.body.get_text_entry()
         # You must implement this!
-        pass
+        self.body.insert_user_message(message)
 
     def check_new(self):
         # You must implement this!
-        pass
+        new_messages = self.direct_messenger.retrieve_new()
+        for message in new_messages:
+            self.body.insert_contact_message(message)
 
     def _draw(self):
         # Build a menu and add it to the root frame.
