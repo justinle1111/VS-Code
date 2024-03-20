@@ -50,15 +50,13 @@ def send_message(token, entry, recipient):
 def request_direct_message(token, direct_message):
   if direct_message == "new":
     message = {"token":token, "direct_message": direct_message}
-    print("Requesting New")
+    return json.dumps(message)
   elif direct_message == "all":
-    message = {"token":token, "direct_message": direct_message}
-    print("Requesting All")
+    message = {"token": token, "direct_message": direct_message}
+    return json.dumps(message)
   else:
     print("Part 1 Direct Message Error")
-  return json.dumps(message)
-
-
+  
 def json_to_list(json_string):
   try:
     converted_json_string = json.loads(json_string)
