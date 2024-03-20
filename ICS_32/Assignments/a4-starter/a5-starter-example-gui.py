@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk, filedialog
 from typing import Text
 import ds_messenger
+import tkinter.messagebox as messagebox
 
 class Body(tk.Frame):
     def __init__(self, root, recipient_selected_callback=None):
@@ -42,6 +43,10 @@ class Body(tk.Frame):
     def set_text_entry(self, text:str):
         self.message_editor.delete(1.0, tk.END)
         self.message_editor.insert(1.0, text)
+        
+    def clear_messages(self):
+        # Clear the message display area (e.g., Text widget)
+        self.entry_editor.delete('1.0', tk.END)
 
     def _draw(self):
         posts_frame = tk.Frame(master=self, width=250)
@@ -82,15 +87,20 @@ class Body(tk.Frame):
 
 
 class Footer(tk.Frame):
-    def __init__(self, root, send_callback=None):
+    def __init__(self, root, send_callback=None, dsu_callback=None):
         tk.Frame.__init__(self, root)
         self.root = root
         self._send_callback = send_callback
+        self._dsu_callback = dsu_callback
         self._draw()
 
     def send_click(self):
         if self._send_callback is not None:
             self._send_callback()
+
+    def dsu_click(self):
+        if self._dsu_callback is not None:
+            self._dsu_callback()
 
     def _draw(self):
         save_button = tk.Button(master=self, text="Send", width=20, command=self.send_click)
@@ -101,6 +111,9 @@ class Footer(tk.Frame):
 
         self.footer_label = tk.Label(master=self, text="Ready.")
         self.footer_label.pack(fill=tk.BOTH, side=tk.LEFT, padx=5)
+
+        dsu_server_button = tk.Button(master=self, text="Load DSU Profile", width=20, command=self.dsu_click)
+        dsu_server_button.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
 
 
 class NewContactDialog(tk.simpledialog.Dialog):
@@ -133,7 +146,7 @@ class NewContactDialog(tk.simpledialog.Dialog):
         self.password_label = tk.Label(frame, width=30, text="Password")
         self.password_label.pack()
         self.password_entry = tk.Entry(frame, width=30)
-        self.password_entry.insert(tk.END, self.user)
+        self.password_entry.insert(tk.END, self.pwd)
         self.password_entry['show'] = '*'
         self.password_entry.pack()
 
@@ -141,6 +154,52 @@ class NewContactDialog(tk.simpledialog.Dialog):
         self.user = self.username_entry.get()
         self.pwd = self.password_entry.get()
         self.server = self.server_entry.get()
+
+class DSU_Server_Dialog(tk.simpledialog.Dialog):
+    def __init__(self, root, title=None, user=None, pwd=None, server=None, path =None, name=None):
+        self.root = root
+        self.server = server
+        self.user = user
+        self.pwd = pwd
+        self.path = path
+        self.name = name
+        super().__init__(root, title)
+
+    def body(self, frame):
+        self.load_DSU_label = tk.Label(frame, width=30, text="Please Load Your DSU File (Input Your DSU file Path)")
+        self.load_DSU_label.pack()
+        self.load_DSU_entry = tk.Entry(frame, width=30)
+        self.load_DSU_entry.insert(tk.END, self.path)
+        self.load_DSU_entry.pack()
+
+        self.create_file_label = tk.Label(frame, width=30, text="If you don't have a DSU file Please create it here!")
+        self.create_file_label.pack()
+
+        self.username_label = tk.Label(frame, width=30, text="Username for DSU file")
+        self.username_label.pack()
+        self.username_entry = tk.Entry(frame, width=30)
+        self.username_entry.insert(tk.END, self.name)
+        self.username_entry.pack()
+
+        self.name_label = tk.Label(frame, width=30, text="Name for DSU file")
+        self.name_label.pack()
+        self.name_entry = tk.Entry(frame, width=30)
+        self.name_entry.insert(tk.END, self.user)
+        self.name_entry.pack()
+
+        self.password_label = tk.Label(frame, width=30, text="Password for DSU file")
+        self.password_label.pack()
+        self.password_entry = tk.Entry(frame, width=30)
+        self.password_entry.insert(tk.END, self.user)
+        self.password_entry['show'] = '*'
+        self.password_entry.pack()
+
+    def apply(self):
+        self.user = self.username_entry.get()
+        self.pwd = self.password_entry.get()
+        self.load_DSU = self.load_DSU_entry.get()
+        self.name = self.name_entry.get()
+
 
 
 class MainApp(tk.Frame):
@@ -160,6 +219,7 @@ class MainApp(tk.Frame):
         # into the root frame
         self._draw()
         self.body.insert_contact("studentexw23") # adding one example student.
+        self.body.insert_contact("saitama")
 
     def send_message(self):
         # You must implement this!
@@ -167,16 +227,27 @@ class MainApp(tk.Frame):
         send_msg = self.direct_messenger.send(message, self.recipient)
         self.publish(send_msg)
 
+    def dsu_add(self):
+        pass
+
     def add_contact(self):
         # You must implement this!
         # Hint: check how to use tk.simpledialog.askstring to retrieve
         # the name of the new contact, and then use one of the body
         # methods to add the contact to your contact list
         contact = tk.simpledialog.askstring("Contact", "Add your contact:")
-        self.body.insert_contact(contact)
+        if contact not in self.body._contacts:
+            self.body.insert_contact(contact)
+        else:
+            messagebox.showinfo("Contact Exists", f"The contact '{contact}' already exists.")
 
     def recipient_selected(self, recipient):
         self.recipient = recipient
+        self._current_recipient = recipient
+        # Clear the message display area
+        self.body.clear_messages()
+        self.publish_recipient()
+        self.body.set_text_entry("")
 
     def configure_server(self):
         ud = NewContactDialog(self.root, "Configure Account",
@@ -194,11 +265,20 @@ class MainApp(tk.Frame):
         # You must implement this!
         self.body.insert_user_message(message)
 
+    def publish_recipient(self):
+        self.body.clear_messages()
+        all_messages = self.direct_messenger.retrieve_all()
+        for message in all_messages:
+            if message['from'] == self.recipient:
+                self.body.insert_contact_message(message['message'])
+
     def check_new(self):
         # You must implement this!
         new_messages = self.direct_messenger.retrieve_new()
         for message in new_messages:
-            self.body.insert_contact_message(message)
+            if message['from'] == self.recipient:
+                self.body.insert_contact_message(message['message'])
+        self.root.after(2000, self.check_new)
 
     def _draw(self):
         # Build a menu and add it to the root frame.
@@ -223,9 +303,8 @@ class MainApp(tk.Frame):
         self.body = Body(self.root,
                          recipient_selected_callback=self.recipient_selected)
         self.body.pack(fill=tk.BOTH, side=tk.TOP, expand=True)
-        self.footer = Footer(self.root, send_callback=self.send_message)
+        self.footer = Footer(self.root, send_callback=self.send_message, dsu_callback=self.dsu_add)
         self.footer.pack(fill=tk.BOTH, side=tk.BOTTOM)
-
 
 if __name__ == "__main__":
     # All Tkinter programs start with a root window. We will name ours 'main'.

@@ -44,7 +44,7 @@ def bio(token, bio):
 
 def send_message(token, entry, recipient):
   timestamp = time.time()
-  message = {"token":token, "direct_message": {"entry": entry, "recipient": recipient, "timestamp": timestamp}}
+  message = {"token":token, "directmessage": {"entry": entry, "recipient": recipient, "timestamp": timestamp}}
   return json.dumps(message)
 
 def direct_message_all(token):
