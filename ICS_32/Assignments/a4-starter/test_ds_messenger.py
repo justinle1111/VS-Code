@@ -8,3 +8,4 @@ password = "AMONGUSPASSWORDSECRET"
 
 direct_message = ds_messenger.DirectMessenger(server, username, password)
 print(direct_message.retrieve_new())
+print(direct_message.retrieve_all())

@@ -47,16 +47,14 @@ def send_message(token, entry, recipient):
   message = {"token":token, "direct_message": {"entry": entry, "recipient": recipient, "timestamp": timestamp}}
   return json.dumps(message)
 
-def request_direct_message(token, direct_message):
-  if direct_message == "new":
-    message = {"token":token, "direct_message": direct_message}
-    return json.dumps(message)
-  elif direct_message == "all":
-    message = {"token": token, "direct_message": direct_message}
-    return json.dumps(message)
-  else:
-    print("Part 1 Direct Message Error")
-  
+def direct_message_all(token):
+  message = {"token": token, "directmessage": "all"}
+  return json.dumps(message)
+
+def direct_message_new(token):
+  message = {"token": token, "directmessage": "new"}
+  return json.dumps(message)
+
 def json_to_list(json_string):
   try:
     converted_json_string = json.loads(json_string)

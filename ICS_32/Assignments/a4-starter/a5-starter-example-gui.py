@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, filedialog
 from typing import Text
-
+import ds_messenger
 
 class Body(tk.Frame):
     def __init__(self, root, recipient_selected_callback=None):
@@ -93,7 +93,7 @@ class Footer(tk.Frame):
             self._send_callback()
 
     def _draw(self):
-        save_button = tk.Button(master=self, text="Send", width=20)
+        save_button = tk.Button(master=self, text="Send", width=20, command=self.send_click)
         # You must implement this.
         # Here you must configure the button to bind its click to
         # the send_click() function.
@@ -130,7 +130,12 @@ class NewContactDialog(tk.simpledialog.Dialog):
         # such that when the user types, the only thing that appears are
         # * symbols.
         #self.password...
-
+        self.password_label = tk.Label(frame, width=30, text="Password")
+        self.password_label.pack()
+        self.password_entry = tk.Entry(frame, width=30)
+        self.password_entry.insert(tk.END, self.user)
+        self.password_entry['show'] = '*'
+        self.password_entry.pack()
 
     def apply(self):
         self.user = self.username_entry.get()
@@ -149,7 +154,7 @@ class MainApp(tk.Frame):
         # You must implement this! You must configure and
         # instantiate your DirectMessenger instance after this line.
         #self.direct_messenger = ... continue!
-
+        self.direct_messenger = ds_messenger.DirectMessenger(self.server, self.username, self.password)
         # After all initialization is complete,
         # call the _draw method to pack the widgets
         # into the root frame
@@ -179,6 +184,7 @@ class MainApp(tk.Frame):
         # You must implement this!
         # You must configure and instantiate your
         # DirectMessenger instance after this line.
+        self.direct_messenger = ds_messenger.DirectMessenger(self.server, self.username, self.password)
 
     def publish(self, message:str):
         # You must implement this!

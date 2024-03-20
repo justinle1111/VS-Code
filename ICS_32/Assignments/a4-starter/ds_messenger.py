@@ -45,7 +45,7 @@ class DirectMessenger:
   def retrieve_new(self) -> list:
     # must return a list of DirectMessage objects containing all new messages
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
-      client.connect((server, port))
+      client.connect((self.dsuserver, port))
       send = client.makefile('w') 
       recv = client.makefile('r')
       join_msg = ds_protocol.join(self.username, self.password)
@@ -56,29 +56,28 @@ class DirectMessenger:
       token = resp.token
 
       if resp.type == "ok":
-        msg = ds_protocol.request_direct_message(token, "new")
+        msg = ds_protocol.direct_message_new(token)
         client.sendall(msg.encode("utf-8"))
-        
+        server_response = client.recv(4096)
+        server_response = json.loads(server_response.decode("utf-8"))
+        return server_response["response"]["messages"]
+
   def retrieve_all(self) -> list:
     # must return a list of DirectMessage objects containing all messages
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
-      try:
-        client.connect((server, port))
-        send = client.makefile('w') 
-        recv = client.makefile('r')
-        join_msg = ds_protocol.join()
-        send.write(join_msg + '\r\n')
-        send.flush()
-        resp = recv.readline()
-        resp = ds_protocol.extract_json(resp)
-        token = resp.token
+      client.connect((self.dsuserver, port))
+      send = client.makefile('w') 
+      recv = client.makefile('r')
+      join_msg = ds_protocol.join(self.username, self.password)
+      send.write(join_msg + '\r\n')
+      send.flush()
+      resp = recv.readline()
+      resp = ds_protocol.extract_json(resp)
+      token = resp.token
 
-        if resp.type == "ok":
-          msg = ds_protocol.request_direct_message(token, "all")
-          client.sendall(msg.encode("utf-8"))
-          server_message = client.recv(4096)
-          print("Retrieve All Works")
-        return msg
-      except Exception as error:
-        print("(Messenger.py) Retrieve_all Error: ", error)
-        return False
+      if resp.type == "ok":
+        msg = ds_protocol.direct_message_all(token)
+        client.sendall(msg.encode("utf-8"))
+        server_response = client.recv(4096)
+        server_response = json.loads(server_response.decode("utf-8"))
+        return server_response["response"]["messages"]
