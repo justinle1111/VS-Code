@@ -3,6 +3,9 @@ from tkinter import ttk, filedialog
 from typing import Text
 import ds_messenger
 import tkinter.messagebox as messagebox
+import Profile_a4
+from pathlib import Path
+import json
 
 class Body(tk.Frame):
     def __init__(self, root, recipient_selected_callback=None):
@@ -87,20 +90,15 @@ class Body(tk.Frame):
 
 
 class Footer(tk.Frame):
-    def __init__(self, root, send_callback=None, dsu_callback=None):
+    def __init__(self, root, send_callback=None):
         tk.Frame.__init__(self, root)
         self.root = root
         self._send_callback = send_callback
-        self._dsu_callback = dsu_callback
         self._draw()
 
     def send_click(self):
         if self._send_callback is not None:
             self._send_callback()
-
-    def dsu_click(self):
-        if self._dsu_callback is not None:
-            self._dsu_callback()
 
     def _draw(self):
         save_button = tk.Button(master=self, text="Send", width=20, command=self.send_click)
@@ -111,9 +109,6 @@ class Footer(tk.Frame):
 
         self.footer_label = tk.Label(master=self, text="Ready.")
         self.footer_label.pack(fill=tk.BOTH, side=tk.LEFT, padx=5)
-
-        dsu_server_button = tk.Button(master=self, text="Load DSU Profile", width=20, command=self.dsu_click)
-        dsu_server_button.pack(fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
 
 
 class NewContactDialog(tk.simpledialog.Dialog):
@@ -155,61 +150,53 @@ class NewContactDialog(tk.simpledialog.Dialog):
         self.pwd = self.password_entry.get()
         self.server = self.server_entry.get()
 
-class DSU_Server_Dialog(tk.simpledialog.Dialog):
-    def __init__(self, root, title=None, user=None, pwd=None, server=None, path =None, name=None):
-        self.root = root
-        self.server = server
-        self.user = user
-        self.pwd = pwd
-        self.path = path
-        self.name = name
-        super().__init__(root, title)
-
-    def body(self, frame):
-        self.load_DSU_label = tk.Label(frame, width=30, text="Please Load Your DSU File (Input Your DSU file Path)")
-        self.load_DSU_label.pack()
-        self.load_DSU_entry = tk.Entry(frame, width=30)
-        self.load_DSU_entry.insert(tk.END, self.path)
-        self.load_DSU_entry.pack()
-
-        self.create_file_label = tk.Label(frame, width=30, text="If you don't have a DSU file Please create it here!")
-        self.create_file_label.pack()
-
-        self.username_label = tk.Label(frame, width=30, text="Username for DSU file")
-        self.username_label.pack()
-        self.username_entry = tk.Entry(frame, width=30)
-        self.username_entry.insert(tk.END, self.name)
-        self.username_entry.pack()
-
-        self.name_label = tk.Label(frame, width=30, text="Name for DSU file")
-        self.name_label.pack()
-        self.name_entry = tk.Entry(frame, width=30)
-        self.name_entry.insert(tk.END, self.user)
-        self.name_entry.pack()
-
-        self.password_label = tk.Label(frame, width=30, text="Password for DSU file")
-        self.password_label.pack()
-        self.password_entry = tk.Entry(frame, width=30)
-        self.password_entry.insert(tk.END, self.user)
-        self.password_entry['show'] = '*'
-        self.password_entry.pack()
-
-    def apply(self):
-        self.user = self.username_entry.get()
-        self.pwd = self.password_entry.get()
-        self.load_DSU = self.load_DSU_entry.get()
-        self.name = self.name_entry.get()
-
-
-
 class MainApp(tk.Frame):
     def __init__(self, root):
         tk.Frame.__init__(self, root)
         self.root = root
-        self.username = "ILOVEKIMCHAEWON534912"
-        self.password = "AMONGUSPASSWORDSECRET"
-        self.server = "168.235.86.101"
+        file_username = input("Thank You! Please Enter Your Username You Want: \n")
+        file_password = input("Thank You! Please Enter Your Password You Want: \n")
+        server = input("Please Enter the IP Address for the Server: \n")
+        user_input = input("Welcome! Do you want to create or load a DSU file (type 'c' to create or ‘o' to load): \n")
+        global file_path
+        if user_input == "c":
+            file_name = input("Great! What would you like the name the File? \n")
+            file_path = input("Thank You! Where would you like the file to be placed? (Send the Path) \n")
+
+            try:
+            
+                file_path = file_path + "/" + file_name + ".dsu"
+                file_Path = Path(file_path)
+
+                if file_Path.exists():
+                    print("Your File Has Already Been Created")
+                    user_profile = Profile_a4.Profile()
+                    user_profile.load_profile(file_path)
+                    print("File has been Loaded Successfully")
+                else:
+                    file_Path.touch()
+                    print("Your File Has Been Created")
+                    user_profile = Profile_a4.Profile(dsuserver=file_path, username=file_username, password=file_password)
+                    user_profile.save_profile(file_path)
+                    user_profile.load_profile(file_path)
+            except Exception as error:
+                print("Error: a4.py create", error)
+        elif user_input == "o":
+            try:
+                file_path = str(input("Great! What is the name of the file you would like to load? \n"))
+                if ".dsu" in file_path:
+                    user_profile = Profile_a4.Profile()
+                    user_profile.load_profile(file_path)
+                    print("Your File Has Been Loaded")
+                else:
+                    print("Invalid File Path (user_input o error)")
+            except Exception as error:
+                print("Error: a4.py load", error)
+        self.username = file_username
+        self.password = file_password
+        self.server = server #"168.235.86.101"
         self.recipient = None
+        self.dsu_file = file_path
         # You must implement this! You must configure and
         # instantiate your DirectMessenger instance after this line.
         #self.direct_messenger = ... continue!
@@ -218,17 +205,29 @@ class MainApp(tk.Frame):
         # call the _draw method to pack the widgets
         # into the root frame
         self._draw()
-        self.body.insert_contact("studentexw23") # adding one example student.
-        self.body.insert_contact("saitama")
+        with open(self.dsu_file, "r") as file:
+            profile_data = json.load(file)
+        friends_list = profile_data["_friends"]
+
+        for friend in friends_list:
+            self.body.insert_contact(friend)
 
     def send_message(self):
         # You must implement this!
         message = self.body.get_text_entry()
         send_msg = self.direct_messenger.send(message, self.recipient)
-        self.publish(send_msg)
 
-    def dsu_add(self):
-        pass
+        post = Profile_a4.Post()
+        post.set_entry(message)
+        post.set_recipient(self.recipient)
+        post.update_recipient(self.recipient)
+
+        user_profile = Profile_a4.Profile()
+        user_profile.load_profile(file_path)
+        user_profile.get_posts()
+        user_profile.add_post(post)
+        user_profile.save_profile(file_path)
+        self.publish(send_msg)
 
     def add_contact(self):
         # You must implement this!
@@ -238,14 +237,22 @@ class MainApp(tk.Frame):
         contact = tk.simpledialog.askstring("Contact", "Add your contact:")
         if contact not in self.body._contacts:
             self.body.insert_contact(contact)
+            friend = Profile_a4.Friends()
+            friend.set_friends(contact)
+            user_profile = Profile_a4.Profile()
+            user_profile.load_profile(file_path)
+            user_profile.add_friend(contact)
+            user_profile.save_profile(file_path)
         else:
             messagebox.showinfo("Contact Exists", f"The contact '{contact}' already exists.")
+
 
     def recipient_selected(self, recipient):
         self.recipient = recipient
         self._current_recipient = recipient
         # Clear the message display area
         self.body.clear_messages()
+
         self.publish_recipient()
         self.body.set_text_entry("")
 
@@ -267,10 +274,28 @@ class MainApp(tk.Frame):
 
     def publish_recipient(self):
         self.body.clear_messages()
-        all_messages = self.direct_messenger.retrieve_all()
-        for message in all_messages:
-            if message['from'] == self.recipient:
-                self.body.insert_contact_message(message['message'])
+        try:
+            all_messages = self.direct_messenger.retrieve_all()
+            for message in all_messages:
+                if message['from'] == self.recipient:
+                    self.body.insert_contact_message(message['message'])
+                    friend = Profile_a4.Friends()
+                    friend.set_friends(message['from'])
+                    profile_message = Profile_a4.Message()
+                    profile_message.set_messages(message)
+                    user_profile = Profile_a4.Profile()
+                    user_profile.load_profile(file_path)
+                    user_profile.get_messages()
+                    user_profile.add_message(message)
+                    user_profile.save_profile(file_path)
+        except:
+            user_profile = Profile_a4.Profile()
+            user_profile.load_profile(file_path)
+            all_messages = user_profile.get_messages()
+            for message in all_messages:
+                if message['from'] == self.recipient:
+                    self.body.insert_contact_message(message['message'])
+
 
     def check_new(self):
         # You must implement this!
@@ -278,6 +303,16 @@ class MainApp(tk.Frame):
         for message in new_messages:
             if message['from'] == self.recipient:
                 self.body.insert_contact_message(message['message'])
+                friend = Profile_a4.Friends()
+                friend.set_friends(message['from'])
+                profile_message = Profile_a4.Message()
+                profile_message.set_messages(message)
+                user_profile = Profile_a4.Profile()
+                user_profile.load_profile(file_path)
+                print("Your File Has Been Loaded")
+                user_profile.get_messages()
+                user_profile.add_message(message)
+                user_profile.save_profile(file_path)
         self.root.after(2000, self.check_new)
 
     def _draw(self):
@@ -297,13 +332,12 @@ class MainApp(tk.Frame):
                                   command=self.add_contact)
         settings_file.add_command(label='Configure DS Server',
                                   command=self.configure_server)
-
         # The Body and Footer classes must be initialized and
         # packed into the root window.
         self.body = Body(self.root,
                          recipient_selected_callback=self.recipient_selected)
         self.body.pack(fill=tk.BOTH, side=tk.TOP, expand=True)
-        self.footer = Footer(self.root, send_callback=self.send_message, dsu_callback=self.dsu_add)
+        self.footer = Footer(self.root, send_callback=self.send_message)
         self.footer.pack(fill=tk.BOTH, side=tk.BOTTOM)
 
 if __name__ == "__main__":
