@@ -1,6 +1,10 @@
 import socket
 import ds_protocol
 import json
+
+#Justin Le
+#50644854
+#lej42
 server = "168.235.86.101"
 port = 3021
 
